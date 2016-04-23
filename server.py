@@ -67,7 +67,8 @@ def get_position(_id, timestamp):
 def select_intention(_id=0, data={}):
     cands = []
 
-    cands.append(1)
+    if TIME not in data or ADDRESS not in data:
+    	cands.append(1)
 
     if data[TIME]:
     	cands.append(3)
