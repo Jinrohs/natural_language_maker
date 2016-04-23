@@ -36,15 +36,14 @@ satelite_data = {
 [POS, TIME, ADDRESS]=[2, 3, 4]
 
 def get_localtime(unixtime, pos):
-    url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(round(pos[0],7)) + "," + str(round(pos[1], 7)) +"&timestamp=" + unixtime
+    url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(round(pos[0],7)) + "," + str(round(pos[1], 7)) +"&timestamp=" + unixtime + "&key=AIzaSyC5n6UIB3HT8mifCTzrkU4PSXGcBDL7wYE"
     timeinfo = requests.get(url).json()
     if timeinfo["status"] != "OK":
-        print timeinfo
-        print url
+    	print timeinfo
+    	print url
 	return None
 
     result = int(unixtime) + timeinfo["rawOffset"] + timeinfo["dstOffset"] 
-
     return result
 
 def get_picurl(data={}):
@@ -67,17 +66,17 @@ def get_position(_id, timestamp):
 def select_intention(_id=0, data={}):
     cands = []
 
-    if TIME not in data or ADDRESS not in data:
+    if not data[TIME] or not data[ADDRESS]:
     	cands.append(1)
+    else:
+    	if data[POS]:
+    		cands.append(2)
 
-    if data[POS]:
-    	cands.append(2)
-
-    if data[TIME]:
-    	cands.append(3)
+    	if data[TIME]:
+    		cands.append(3)
  
-    if data[ADDRESS]:
-        cands.append(4)
+    	if data[ADDRESS]:
+        	cands.append(4)
 
     if len(cands) == 0:
  	cands.append(1)
@@ -127,8 +126,15 @@ def generate_timeinfo(data={}):
     return comment
 
 def generate_posinfo(data={}):
-
-    comment = "{0},{1}なう".format(data[POS][0], data[POS][1])
+    if data[POS][0] > 0:
+	lat = "北緯"
+    else:
+	lat = "南緯"
+    if data[POS][1] > 0:
+	lon = "東経"
+    else:
+	lon = "西経"
+    comment = lat+"{0}度,".format(data[POS][0])+lon+"{0}度なう".format(data[POS][1])
     return comment
 
 def select_comment(intention=0, data={}):
@@ -180,7 +186,6 @@ def home():
 
     # 意図の決定
     intention = select_intention(_id=_id, data=data)
-
     # コメントの生成
     comment = select_comment(intention=intention, data=data)
     print intention, comment
@@ -192,7 +197,8 @@ def home():
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
-gmaps = googlemaps.Client('AIzaSyBaXrjMRZo2WFyYBAtvamA7ukoW70ttYzY')
+gmaps = googlemaps.Client('AIzaSyC5n6UIB3HT8mifCTzrkU4PSXGcBDL7wYE')
+#'AIzaSyBaXrjMRZo2WFyYBAtvamA7ukoW70ttYzY'
 with open("zatudan.text") as fp:
     zatudan_data = map(lambda x: x.rstrip(), fp.readlines())
 
