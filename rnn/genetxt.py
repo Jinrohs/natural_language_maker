@@ -67,33 +67,38 @@ if args.gpu >= 0:
 
 model.predictor.reset_state()
 
-primetext = args.primetext
-if isinstance(primetext, six.binary_type):
-    primetext = primetext.decode('utf-8')
+for line in iter(sys.stdin.readline,""):
+    line = line.rstrip()
 
-if primetext in vocab:
-    prev_word = Variable(xp.array([vocab[primetext]], xp.int32))
-else:
-    print('ERROR: Unfortunately ' + primetext + ' is unknown.')
-    exit()
+    #primetext = args.primetext
+    primetext = line
+    if isinstance(primetext, six.binary_type):
+        primetext = primetext.decode('utf-8')
 
-prob = F.softmax(model.predictor(prev_word))
-sys.stdout.write(primetext + ' ')
+    if primetext in vocab:
+        prev_word = Variable(xp.array([vocab[primetext]], xp.int32))
+    else:
+        print('ERROR: Unfortunately ' + primetext + ' is unknown.')
+        #exit()
+        continue
 
-for i in six.moves.range(args.length):
     prob = F.softmax(model.predictor(prev_word))
-    if args.sample > 0:
-        probability = cuda.to_cpu(prob.data)[0].astype(np.float64)
-        probability /= np.sum(probability)
-        index = np.random.choice(range(len(probability)), p=probability)
-    else:
-        index = np.argmax(cuda.to_cpu(prob.data))
+    sys.stdout.write(primetext + ' ')
 
-    if ivocab[index] == '<eos>':
-        sys.stdout.write('.')
-    else:
-        sys.stdout.write(ivocab[index] + ' ')
+    for i in six.moves.range(args.length):
+        prob = F.softmax(model.predictor(prev_word))
+        if args.sample > 0:
+            probability = cuda.to_cpu(prob.data)[0].astype(np.float64)
+            probability /= np.sum(probability)
+            index = np.random.choice(range(len(probability)), p=probability)
+        else:
+            index = np.argmax(cuda.to_cpu(prob.data))
 
-    prev_word = Variable(xp.array([index], dtype=xp.int32))
+        if ivocab[index] == '<eos>':
+            sys.stdout.write('.')
+        else:
+            sys.stdout.write(ivocab[index] + ' ')
 
-sys.stdout.write('\n')
+        prev_word = Variable(xp.array([index], dtype=xp.int32))
+
+    sys.stdout.write('\n')

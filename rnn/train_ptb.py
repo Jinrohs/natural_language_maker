@@ -179,10 +179,10 @@ for i in six.moves.range(jump * n_epoch):
 
     sys.stdout.flush()
 
-# Evaluate on test dataset
-print('test')
-test_perp = evaluate(test_data)
-print('test perplexity:', test_perp)
+## Evaluate on test dataset
+#print('test')
+#test_perp = evaluate(test_data)
+#print('test perplexity:', test_perp)
 
 # Save the model and the optimizer
 print('save the model')
