@@ -128,8 +128,7 @@ def generate_timeinfo(data={}):
 
 def generate_posinfo(data={}):
 
-    address = convert_geocode(data[POS][0], data[POS][1])
-    comment = "{0}なう".format(address)
+    comment = "{0},{1}なう".format(data[POS][0], data[POS][1])
     return comment
 
 def select_comment(intention=0, data={}):
