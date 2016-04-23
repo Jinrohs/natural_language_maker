@@ -177,6 +177,12 @@ for i in six.moves.range(jump * n_epoch):
             optimizer.lr /= 1.2
             print('learning rate =', optimizer.lr)
 
+        # Save the model and the optimizer
+        print('save the model')
+        serializers.save_npz('rnnlm.model', model)
+        print('save the optimizer')
+        serializers.save_npz('rnnlm.state', optimizer)
+
     sys.stdout.flush()
 
 ## Evaluate on test dataset
