@@ -33,13 +33,11 @@ satelite_data = {
     }
 }
 
-[POS]=[0]
-[TIME]=[1]
+[POS, TIME]=[0, 1]
 
 def get_localtime(unixtime, pos):
     url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(round(pos[0],7)) + "," + str(round(pos[1], 7)) +"&timestamp=" + unixtime
-    s = requests.Session() 
-    timeinfo = s.get(url).json()
+    timeinfo = requests.get(url).json()
     if timeinfo["status"] == "ZERO_RESULTS":
 	return None
 
@@ -55,8 +53,8 @@ def get_picurl(data={}):
 
 def get_position(_id, timestamp):
     url="http://210.140.86.209:5000/lat_lng_alt?time=" + timestamp + "&ids="+_id
-    s = requests.Session()
-    result = s.get(url).json()
+    result = requests.get(url).json()
+    print "fuga"
     return [result["ResultSet"][str(_id)]["latitude"], result["ResultSet"][str(_id)]["longitude"]]
 
 # intention 意図
