@@ -46,11 +46,7 @@ def select_intention(_id=0, data={}):
     return res
 
 def generate_zatudan():
-    comments = [
-    "地球は青いなー",
-    "abc"
-    ]
-    return random.choice(comments)
+    return random.choice(zatudan_data)
 
 def generate_posinfo(data={}):
     comment = "{0},{1}なう".format(data[POS][0], data[POS][1])
@@ -66,7 +62,7 @@ def select_comment(intention=0, data={}):
 
     return comment
 
-"""Routing: リクエストの URI とメソッドに応じた処理を呼び出し、結果を返す。"""
+
 @app.route('/', methods=['GET'])
 def home():
     try:
@@ -93,6 +89,10 @@ def home():
     response = jsonify(response)
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
+
+
+with open("zatudan.text") as fp:
+    zatudan_data = map(lambda x: x.rstrip(), fp.readlines())
 
 if __name__ == '__main__':
 
