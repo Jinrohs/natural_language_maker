@@ -33,7 +33,7 @@ satelite_data = {
     }
 }
 
-[POS, TIME, ADDRESS]=[2, 3, 4]
+[POS, TIME, ADDRESS, ID]=[2, 3, 4, 5]
 
 def get_localtime(unixtime, pos):
     url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(round(pos[0],7)) + "," + str(round(pos[1], 7)) +"&timestamp=" + unixtime + "&key=AIzaSyC5n6UIB3HT8mifCTzrkU4PSXGcBDL7wYE"
@@ -85,8 +85,11 @@ def select_intention(_id=0, data={}):
     res = random.choice(cands)
     return res
 
-def generate_zatudan():
-    return random.choice(zatudan_data)
+def generate_zatudan(data={}):
+    if data[ID] == '29479': # ひので
+        return random.choice(zatudan_data)
+    else:
+        return random.choice(zatudan_hinode_data)
 
 def convert_geocode(lon, lat):
     try:
@@ -139,7 +142,7 @@ def generate_posinfo(data={}):
 
 def select_comment(intention=0, data={}):
     if intention == 1:
-        comment = generate_zatudan()
+        comment = generate_zatudan(data=data)
     elif intention == 2:
 	comment = generate_posinfo(data=data) 
     elif intention == 3:
@@ -174,6 +177,7 @@ def home():
 
     # 状況の取得
     data = {}
+    data[ID] = _id
     pos = get_position(_id, timestamp)
     address = convert_geocode(pos[0], pos[1])
     loctime = get_localtime(timestamp, pos)
@@ -201,6 +205,8 @@ gmaps = googlemaps.Client('AIzaSyC5n6UIB3HT8mifCTzrkU4PSXGcBDL7wYE')
 #'AIzaSyBaXrjMRZo2WFyYBAtvamA7ukoW70ttYzY'
 with open("zatudan.text") as fp:
     zatudan_data = map(lambda x: x.rstrip(), fp.readlines())
+with open("zatudan_hinode.text") as fp:
+    zatudan_hinode_data = map(lambda x: x.rstrip(), fp.readlines())
 
 if __name__ == '__main__':
 
