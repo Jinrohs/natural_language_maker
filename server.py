@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify
 import json
 import random
 import googlemaps
+import urllib2
 
 app = Flask(__name__)
 
@@ -29,7 +30,9 @@ satelite_data = {
 [POS]=[0]
 
 def get_position(_id):
-    #return [192, 168]
+    #response = urllib2.urlopen('http://python.org/')
+    #html = response.read()
+
     #return [35.7084958, -139.8130165]
     return [40.714224, -73.961452]
 
