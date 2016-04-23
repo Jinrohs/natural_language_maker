@@ -75,6 +75,8 @@ def select_intention(_id=0, data={}):
     if data[ADDRESS]:
         cands.append(4)
 
+    print cands
+
     res = random.choice(cands)
     return res
 
@@ -92,14 +94,14 @@ def convert_geocode(lon, lat):
         address = u"{0}_{1}".format(country, admin_area)
     except:
         address = ""
+    print "address:", address
     return address
 
-def generate_addresinfo(data={}):
+def generate_addressinfo(data={}):
 
     #address = convert_geocode(data[POS][0], data[POS][1])
     comment = "{0}なう".format(data[ADDRESS])
 
-    print "address:", address
     return comment
 
 def generate_timeinfo(data={}):
@@ -121,8 +123,6 @@ def generate_timeinfo(data={}):
 def select_comment(intention=0, data={}):
     if intention == 1:
         comment = generate_zatudan()
-    #elif intention == 2:
-    #    comment = generate_posinfo(data=data)
     elif intention == 3:
 	comment = generate_timeinfo(data=data)
     elif intention == 4:
@@ -157,7 +157,6 @@ def home():
     data = {}
     pos = get_position(_id, timestamp)
     address = convert_geocode(pos[0], pos[1])
-    #print 'pos = ', pos
     loctime = get_localtime(timestamp, pos)
     data[POS] = pos
     data[ADDRESS] = address
@@ -185,10 +184,6 @@ with open("zatudan.text") as fp:
     zatudan_data = map(lambda x: x.rstrip(), fp.readlines())
 
 if __name__ == '__main__':
-
-    #convert_geocode(35.691219,139.7806127)
-    #convert_geocode(42.9882224,141.5292633)
-    #exit()
 
     _port = 30000
     app.run(host='0.0.0.0', debug=True, port=_port)
