@@ -3,7 +3,7 @@
 
 from flask import Flask, request, jsonify
 import json
-
+import random
 
 app = Flask(__name__)
 
@@ -25,20 +25,46 @@ satelite_data = {
     }
 }
 
-# intension 意図
-# 0: エラー
-# 1: 雑談
-# 2: 位置情報について
-
+[POS]=[0]
 
 def get_position(_id):
     return [192, 168]
 
-def select_intention(_id=0, pos=""):
-    return 1
+# intension 意図
+# 0: エラー
+# 1: 雑談
+# 2: 位置情報について
+def select_intention(_id=0, data={}):
+    cands = []
 
-def select_comment(intension=0):
-    return "hoge"
+    cands.append(1)
+
+    if data[POS]:
+        cands.append(2)
+
+    res = random.choice(cands)
+    return res
+
+def generate_zatudan():
+    comments = [
+    "地球は青いなー",
+    "abc"
+    ]
+    return random.choice(comments)
+
+def generate_posinfo(data={}):
+    comment = "{0},{1}なう".format(data[POS][0], data[POS][1])
+    return comment
+
+def select_comment(intention=0, data={}):
+    if intention == 1:
+        comment = generate_zatudan()
+    elif intention == 2:
+        comment = generate_posinfo(data=data)
+    else:
+        return "Error!"
+
+    return comment
 
 """Routing: リクエストの URI とメソッドに応じた処理を呼び出し、結果を返す。"""
 @app.route('/', methods=['GET'])
@@ -51,13 +77,15 @@ def home():
         return "パラメータを正しく設定してください"
 
     # 状況の取得
+    data = {}
     pos = get_position(_id)
+    data[POS] = pos
 
     # 意図の決定
-    intension = select_intention(_id=_id, pos=pos)
+    intention = select_intention(_id=_id, data=data)
 
     # コメントの生成
-    comment = select_comment(intension=intension)
+    comment = select_comment(intention=intention, data=data)
 
     # response オブジェクトの生成
     response = {"result":[{"comment":comment}]}
