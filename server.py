@@ -1,8 +1,8 @@
 #!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 
-import json
 from flask import Flask, request, jsonify
+import json
 
 
 app = Flask(__name__)
@@ -25,17 +25,46 @@ satelite_data = {
     }
 }
 
+# intension 意図
+# 0: エラー
+# 1: 雑談
+# 2: 位置情報について
+
+
+def get_position(_id):
+    return [192, 168]
+
+def select_intention(_id=0, pos=""):
+    return 1
+
+def select_comment(intension=0):
+    return "hoge"
 
 """Routing: リクエストの URI とメソッドに応じた処理を呼び出し、結果を返す。"""
 @app.route('/', methods=['GET'])
 def home():
     try:
-        satelite_id = request.args['satelite_id']
+        _id       = request.args['id']
+        timestamp = request.args['timestamp']
     except Exception as e:
         print("Oh...")
-        exit()
-    return satelite_data[satelite_id]["name"]
+        return "パラメータを正しく設定してください"
 
+    # 状況の取得
+    pos = get_position(_id)
+
+    # 意図の決定
+    intension = select_intention(_id=_id, pos=pos)
+
+    # コメントの生成
+    comment = select_comment(intension=intension)
+
+    # response オブジェクトの生成
+    response = {"result":[{"comment":comment}]}
+
+    response = jsonify(response)
+    response.headers['Access-Control-Allow-Origin'] = "*"
+    return response
 
 if __name__ == '__main__':
 
