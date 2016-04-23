@@ -33,16 +33,18 @@ satelite_data = {
     }
 }
 
-[POS, TIME]=[0, 1]
+[POS, TIME, ADDRESS]=[2, 3, 4]
 
 def get_localtime(unixtime, pos):
     url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(round(pos[0],7)) + "," + str(round(pos[1], 7)) +"&timestamp=" + unixtime
     timeinfo = requests.get(url).json()
-    if timeinfo["status"] == "ZERO_RESULTS":
+    if timeinfo["status"] != "OK":
+        print timeinfo
+        print url
 	return None
 
     result = int(unixtime) + timeinfo["rawOffset"] + timeinfo["dstOffset"] 
-    
+
     return result
 
 def get_picurl(data={}):
@@ -54,24 +56,25 @@ def get_picurl(data={}):
 def get_position(_id, timestamp):
     url="http://210.140.86.209:5000/lat_lng_alt?time=" + timestamp + "&ids="+_id
     result = requests.get(url).json()
-    print "fuga"
     return [result["ResultSet"][str(_id)]["latitude"], result["ResultSet"][str(_id)]["longitude"]]
 
 # intention 意図
 # 0: エラー
 # 1: 雑談
 # 2: 位置情報について
+# 3: 時間情報について
+# 4: 住所情報について
 def select_intention(_id=0, data={}):
     cands = []
 
     cands.append(1)
 
-    if data[POS]:
-        cands.append(2)
-
     if data[TIME]:
     	cands.append(3)
  
+    if data[ADDRESS]:
+        cands.append(4)
+
     res = random.choice(cands)
     return res
 
@@ -91,17 +94,18 @@ def convert_geocode(lon, lat):
         address = ""
     return address
 
-def generate_posinfo(data={}):
+def generate_addresinfo(data={}):
 
-    address = convert_geocode(data[POS][0], data[POS][1])
-    comment = "{0}なう".format(address)
+    #address = convert_geocode(data[POS][0], data[POS][1])
+    comment = "{0}なう".format(data[ADDRESS])
 
+    print "address:", address
     return comment
 
 def generate_timeinfo(data={}):
     seed = time.time()
     r1 = random.SystemRandom(seed) 
-    if (r1 > 0.5):
+    if (r1 > 0.9):
     	comment = "{0}時なう".format(data[TIME])
     else:
     	if (data[TIME] >= 23 or data[TIME] < 6):
@@ -117,10 +121,12 @@ def generate_timeinfo(data={}):
 def select_comment(intention=0, data={}):
     if intention == 1:
         comment = generate_zatudan()
-    elif intention == 2:
-        comment = generate_posinfo(data=data)
+    #elif intention == 2:
+    #    comment = generate_posinfo(data=data)
     elif intention == 3:
 	comment = generate_timeinfo(data=data)
+    elif intention == 4:
+	comment = generate_addressinfo(data=data)
     else:
         return "Error!"
 
@@ -150,9 +156,11 @@ def home():
     # 状況の取得
     data = {}
     pos = get_position(_id, timestamp)
-    print 'pos = ', pos
+    address = convert_geocode(pos[0], pos[1])
+    #print 'pos = ', pos
     loctime = get_localtime(timestamp, pos)
     data[POS] = pos
+    data[ADDRESS] = address
     data[TIME] = None
     if loctime:
     	now = datetime.datetime.utcfromtimestamp(loctime) # Unix time -> UTC の naive オブジェクト
@@ -163,9 +171,10 @@ def home():
 
     # コメントの生成
     comment = select_comment(intention=intention, data=data)
+    print intention, comment
         
     # response オブジェクトの生成
-    response = {"result":[{"comment":comment}]}
+    response = {"result":[{"message":comment, "id":_id}]}
 
     response = jsonify(response)
     response.headers['Access-Control-Allow-Origin'] = "*"
