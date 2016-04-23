@@ -70,14 +70,19 @@ def select_intention(_id=0, data={}):
     if TIME not in data or ADDRESS not in data:
     	cands.append(1)
 
+    if data[POS]:
+    	cands.append(2)
+
     if data[TIME]:
     	cands.append(3)
  
     if data[ADDRESS]:
         cands.append(4)
 
-    print cands
+    if len(cands) == 0:
+ 	cands.append(1)
 
+    print cands
     res = random.choice(cands)
     return res
 
@@ -121,9 +126,17 @@ def generate_timeinfo(data={}):
 		comment = "こんばんはー!"  
     return comment
 
+def generate_posinfo(data={}):
+
+    address = convert_geocode(data[POS][0], data[POS][1])
+    comment = "{0}なう".format(address)
+    return comment
+
 def select_comment(intention=0, data={}):
     if intention == 1:
         comment = generate_zatudan()
+    elif intention == 2:
+	comment = generate_posinfo(data=data) 
     elif intention == 3:
 	comment = generate_timeinfo(data=data)
     elif intention == 4:
