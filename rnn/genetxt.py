@@ -28,8 +28,8 @@ parser.add_argument('--model', '-m', type=str, required=True,
                     help='model data, saved by train_ptb.py')
 parser.add_argument('--vocabulary', '-v', type=str, required=True,
                     help='vocabulary data, saved by train_ptb.py')
-parser.add_argument('--primetext', '-p', type=str, required=True, default='',
-                    help='base text data, used for text generation')
+#parser.add_argument('--primetext', '-p', type=str, required=True, default='',
+#                    help='base text data, used for text generation')
 parser.add_argument('--seed', '-s', type=int, default=123,
                     help='random seeds for text generation')
 parser.add_argument('--unit', '-u', type=int, default=650,
