@@ -4,6 +4,7 @@
 from flask import Flask, request, jsonify
 import json
 import random
+import googlemaps
 
 app = Flask(__name__)
 
@@ -28,7 +29,9 @@ satelite_data = {
 [POS]=[0]
 
 def get_position(_id):
-    return [192, 168]
+    #return [192, 168]
+    #return [35.7084958, -139.8130165]
+    return [40.714224, -73.961452]
 
 # intension 意図
 # 0: エラー
@@ -48,8 +51,24 @@ def select_intention(_id=0, data={}):
 def generate_zatudan():
     return random.choice(zatudan_data)
 
+def convert_geocode(lon, lat):
+    try:
+        res = gmaps.reverse_geocode((lon, lat))
+        for r in res[0]["address_components"]:
+            if 'country' in r['types']:
+                country = r["long_name"]
+            if 'administrative_area_level_1' in r['types']:
+                admin_area = r["long_name"]
+        address = u"{0}_{1}".format(country, admin_area)
+    except:
+        address = ""
+    return address
+
 def generate_posinfo(data={}):
-    comment = "{0},{1}なう".format(data[POS][0], data[POS][1])
+
+    address = convert_geocode(data[POS][0], data[POS][1])
+    comment = "{0}なう".format(address)
+
     return comment
 
 def select_comment(intention=0, data={}):
@@ -91,10 +110,15 @@ def home():
     return response
 
 
+gmaps = googlemaps.Client('AIzaSyBaXrjMRZo2WFyYBAtvamA7ukoW70ttYzY')
 with open("zatudan.text") as fp:
     zatudan_data = map(lambda x: x.rstrip(), fp.readlines())
 
 if __name__ == '__main__':
+
+    #convert_geocode(35.691219,139.7806127)
+    #convert_geocode(42.9882224,141.5292633)
+    #exit()
 
     _port = 30000
     app.run(host='0.0.0.0', debug=True, port=_port)
