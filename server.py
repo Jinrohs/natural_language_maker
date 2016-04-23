@@ -45,8 +45,9 @@ def get_localtime(unixtime, pos):
     	print url
 	return None
 
-    result = int(unixtime) + timeinfo["rawOffset"] + timeinfo["dstOffset"] 
-    return result
+    loctime = int(unixtime) + timeinfo["rawOffset"] + timeinfo["dstOffset"] 
+    now = datetime.datetime.utcfromtimestamp(loctime) # Unix time -> UTC の naive オブジェクト
+    return now.hour
 
 def get_picurl(data={}):
     zoom = 6
@@ -68,17 +69,34 @@ def get_position(_id, timestamp):
 def select_intention(_id=0, data={}):
     cands = []
 
-    if not data[TIME] or not data[ADDRESS]:
-    	cands.append(1)
-    else:
-    	if data[POS]:
-    		cands.append(2)
+    print data
 
-    	if data[TIME]:
-    		cands.append(3)
- 
-    	if data[ADDRESS]:
-        	cands.append(4)
+    cands.append(1)
+
+    if data[POS]:
+    	cands.append(2)
+
+    if data[TIME]:
+    	cands.append(3)
+    	cands.append(3)
+    	cands.append(3)
+
+    if data[ADDRESS]:
+    	cands.append(4)
+    	cands.append(4)
+    	cands.append(4)
+
+    #if not data[TIME] or not data[ADDRESS]:
+    #	cands.append(1)
+    #else:
+    #	if data[POS]:
+    #		cands.append(2)
+    #
+    #	if data[TIME]:
+    #		cands.append(3)
+    #
+    #	if data[ADDRESS]:
+    #    	cands.append(4)
 
     if len(cands) == 0:
  	cands.append(1)
@@ -109,10 +127,11 @@ def convert_geocode(lon, lat):
 
 def generate_addressinfo(data={}):
 
-    #address = convert_geocode(data[POS][0], data[POS][1])
-    comment = "{0}なう".format(data[ADDRESS])
-
-    return comment
+    info = data[ADDRESS]
+    comments = []
+    comments.append("この辺は{0}かな".format(info))
+    comments.append("いま、{0}にいるよ！".format(info))
+    return random.choice(comments)
 
 def generate_timeinfo(data={}):
     seed = time.time()
@@ -139,8 +158,11 @@ def generate_posinfo(data={}):
 	lon = "東経"
     else:
 	lon = "西経"
-    comment = lat+"{0}度,".format(data[POS][0])+lon+"{0}度なう".format(data[POS][1])
-    return comment
+    info = lat+"{0}度,".format(round(data[POS][0],1))+lon+"{0}度".format(round(data[POS][1],1))
+    comments = []
+    comments.append("この辺は{0}かな".format(info))
+    comments.append("いま、{0}にいるよ！".format(info))
+    return random.choice(comments)
 
 def select_comment(intention=0, data={}):
     if intention == 1:
@@ -182,13 +204,10 @@ def home():
     data[ID] = _id
     pos = get_position(_id, timestamp)
     address = convert_geocode(pos[0], pos[1])
-    loctime = get_localtime(timestamp, pos)
+    utctime = get_localtime(timestamp, pos)
     data[POS] = pos
     data[ADDRESS] = address
-    data[TIME] = None
-    if loctime:
-    	now = datetime.datetime.utcfromtimestamp(loctime) # Unix time -> UTC の naive オブジェクト
-    	data[TIME] = now.hour
+    data[TIME] = utctime
 
     # 意図の決定
     intention = select_intention(_id=_id, data=data)
