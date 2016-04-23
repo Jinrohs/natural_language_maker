@@ -1,0 +1,2 @@
+# natural_language_maker
+発言内容を決定するAPIサーバ
