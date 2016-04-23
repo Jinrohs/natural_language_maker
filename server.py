@@ -37,10 +37,13 @@ satelite_data = {
 [TIME]=[1]
 
 def get_localtime(unixtime, pos):
-    url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(pos[0]) + "," + str(pos[1]) +"&timestamp=" + unixtime
+    url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(round(pos[0],7)) + "," + str(round(pos[1], 7)) +"&timestamp=" + unixtime
     s = requests.Session() 
     timeinfo = s.get(url).json()
-    result =  int(unixtime) + timeinfo["rawOffset"] + timeinfo["dstOffset"] 
+    if timeinfo["status"] == "ZERO_RESULTS":
+	return None
+
+    result = int(unixtime) + timeinfo["rawOffset"] + timeinfo["dstOffset"] 
     
     return result
 
@@ -50,12 +53,11 @@ def get_picurl(data={}):
     url="http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/2012-07-09/EPSG4326_250m/6/" + str(row) + "/" + str(col) + ".jpg"
     return url
 
-def get_position(_id):
-    #response = urllib2.urlopen('http://python.org/')
-    #html = response.read()
-
-    #return [35.7084958, 139.8130165]
-    return [40.714224, -73.961452]
+def get_position(_id, timestamp):
+    url="http://210.140.86.209:5000/lat_lng_alt?time=" + timestamp + "&ids="+_id
+    s = requests.Session()
+    result = s.get(url).json()
+    return [result["ResultSet"][str(_id)]["latitude"], result["ResultSet"][str(_id)]["longitude"]]
 
 # intention 意図
 # 0: エラー
@@ -69,7 +71,8 @@ def select_intention(_id=0, data={}):
     if data[POS]:
         cands.append(2)
 
-    cands.append(3)
+    if data[TIME]:
+    	cands.append(3)
  
     res = random.choice(cands)
     return res
@@ -143,16 +146,19 @@ def home():
         _id       = request.args['id']
         timestamp = request.args['timestamp']
     except Exception as e:
-        irint("Oh...")
+        print("Oh...")
         return "パラメータを正しく設定してください"
 
     # 状況の取得
     data = {}
-    pos = get_position(_id)
+    pos = get_position(_id, timestamp)
+    print 'pos = ', pos
     loctime = get_localtime(timestamp, pos)
-    now = datetime.datetime.utcfromtimestamp(loctime) # Unix time -> UTC の naive オブジェクト
     data[POS] = pos
-    data[TIME] = now.hour
+    data[TIME] = None
+    if loctime:
+    	now = datetime.datetime.utcfromtimestamp(loctime) # Unix time -> UTC の naive オブジェクト
+    	data[TIME] = now.hour
 
     # 意図の決定
     intention = select_intention(_id=_id, data=data)
