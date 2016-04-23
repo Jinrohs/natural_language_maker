@@ -3,6 +3,8 @@
 
 from flask import Flask, request, jsonify
 from datetime import date
+import time
+import datetime
 from time import mktime
 import time
 import json
@@ -87,9 +89,9 @@ def select_intention(_id=0, data={}):
 
 def generate_zatudan(data={}):
     if data[ID] == '29479': # ひので
-        return random.choice(zatudan_data)
-    else:
         return random.choice(zatudan_hinode_data)
+    else:
+        return random.choice(zatudan_data)
 
 def convert_geocode(lon, lat):
     try:
@@ -195,7 +197,10 @@ def home():
     print intention, comment
         
     # response オブジェクトの生成
-    response = {"result":[{"message":comment, "id":_id}]}
+    #response = {"result":[{"message":comment, "id":md5.new(comment).hexdigest()}]}
+    msg_id = int(time.mktime(datetime.datetime.now().timetuple())) + int(_id)
+    print msg_id
+    response = {"result":[{"message":comment, "id":msg_id}]}
 
     response = jsonify(response)
     response.headers['Access-Control-Allow-Origin'] = "*"
@@ -212,4 +217,6 @@ if __name__ == '__main__':
 
     _port = 30000
     app.run(host='0.0.0.0', debug=True, port=_port)
+
+
 
