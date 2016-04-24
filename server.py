@@ -17,21 +17,36 @@ import datetime
 
 app = Flask(__name__)
 
-satelite_data = {
+satellite_data = {
     "33492": {
         "name": "いぶき",
-        "id": 33492,
-        "country": "Japan"
+        "country": "Japan",
+        "type": "satellite"
     },
     "29479": {
         "name": "ひので",
-        "id": 29479,
-        "country": "Japan"
+        "country": "Japan",
+        "type": "satellite"
     },
     "39084": {
         "name": "Landsat 8",
-        "id": 39084,
-        "country": "USA"
+        "country": "USA",
+        "type": "satellite"
+    },
+    "32038": {
+        "name": "BREEZE-M DEB",
+        "country": "_",
+        "type": "deburi"
+    },
+    "39244": {
+        "name": "DEB",
+        "country": "_",
+        "type": "deburi"
+    },
+    "36399": {
+        "name": "DEB",
+        "country": "_",
+        "type": "deburi"
     }
 }
 
@@ -67,15 +82,27 @@ def get_position(_id, timestamp):
 # 3: 時間情報について
 # 4: 住所情報について
 # 6: 衛星の豆知識について
+# 7: デブリについて
+# 8: 生成した雑談
 def select_intention(_id=0, data={}):
     cands = []
 
     print data
 
+    if satellite_data[data[ID]]["type"] == 'deburi':
+        return 7
+
     cands.append(1)
 
     cands.append(6)
     cands.append(6)
+    cands.append(6)
+
+    # ひので
+    if data[ID] == '29479':
+        cands.append(8)
+        cands.append(8)
+        cands.append(8)
 
     if data[POS]:
     	cands.append(2)
@@ -84,8 +111,10 @@ def select_intention(_id=0, data={}):
     	cands.append(3)
     	cands.append(3)
     	cands.append(3)
+    	cands.append(3)
 
     if data[ADDRESS]:
+    	cands.append(4)
     	cands.append(4)
     	cands.append(4)
     	cands.append(4)
@@ -118,6 +147,12 @@ def generate_knowledge(data={}):
         return random.choice(knowledge_lang8_data)
     return "宇宙は広いよ"
 
+def generate_zatudan_gene(data={}):
+    if data[ID] == '29479': # ひので
+        return random.choice(zatudan_hinode_data)
+    else:
+        return "宇宙は広いよ"
+
 def generate_zatudan(data={}):
     if data[ID] == '29479': # ひので
         return random.choice(zatudan_hinode_data)
@@ -137,6 +172,14 @@ def convert_geocode(lon, lat):
         address = ""
     print "address:", address
     return address
+
+def generate_debri(data={}):
+
+    comments = []
+    comments.append("...")
+    comments.append("ぼくはゴミです...")
+    comments.append("...ただ宇宙を漂います")
+    return random.choice(comments)
 
 def generate_addressinfo(data={}):
 
@@ -176,7 +219,7 @@ def generate_posinfo(data={}):
 	lon = "東経"
     else:
 	lon = "西経"
-    info = lat+"{0}度,".format(round(data[POS][0],1))+lon+"{0}度".format(round(data[POS][1],1))
+    info = lat+"{0}度,".format(round(abs(data[POS][0]),1))+lon+"{0}度".format(round(abs(data[POS][1]),1))
     comments = []
     comments.append("{0}に来たよ".format(info))
     comments.append("この辺は{0}かな".format(info))
@@ -194,6 +237,10 @@ def select_comment(intention=0, data={}):
 	comment = generate_addressinfo(data=data)
     elif intention == 6:
 	comment = generate_knowledge(data=data)
+    elif intention == 7:
+	comment = generate_debri(data=data)
+    elif intention == 8:
+	comment = generate_zatudan_gene(data=data)
     else:
         return "Error!"
 
