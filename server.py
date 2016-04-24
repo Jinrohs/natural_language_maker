@@ -35,7 +35,7 @@ satelite_data = {
     }
 }
 
-[POS, TIME, ADDRESS, ID]=[2, 3, 4, 5]
+[POS, TIME, ADDRESS, ID, KNOWLEDGE]=[2, 3, 4, 5, 6]
 
 def get_localtime(unixtime, pos):
     url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(round(pos[0],7)) + "," + str(round(pos[1], 7)) +"&timestamp=" + unixtime + "&key=AIzaSyC5n6UIB3HT8mifCTzrkU4PSXGcBDL7wYE"
@@ -66,12 +66,16 @@ def get_position(_id, timestamp):
 # 2: 位置情報について
 # 3: 時間情報について
 # 4: 住所情報について
+# 6: 衛星の豆知識について
 def select_intention(_id=0, data={}):
     cands = []
 
     print data
 
     cands.append(1)
+
+    cands.append(6)
+    cands.append(6)
 
     if data[POS]:
     	cands.append(2)
@@ -99,11 +103,20 @@ def select_intention(_id=0, data={}):
     #    	cands.append(4)
 
     if len(cands) == 0:
- 	cands.append(1)
+	cands.append(1)
 
     print cands
     res = random.choice(cands)
     return res
+
+def generate_knowledge(data={}):
+    if data[ID] == '29479': # ひので
+        return random.choice(knowledge_hinode_data)
+    elif data[ID] == '33492': # いぶき
+        return random.choice(knowledge_ibuki_data)
+    elif data[ID] == '39084': # lang8
+        return random.choice(knowledge_lang8_data)
+    return "宇宙は広いよ"
 
 def generate_zatudan(data={}):
     if data[ID] == '29479': # ひので
@@ -136,18 +149,22 @@ def generate_addressinfo(data={}):
 def generate_timeinfo(data={}):
     seed = time.time()
     r1 = random.SystemRandom(seed) 
+    comments = []
     if (r1 > 0.9):
-    	comment = "{0}時なう".format(data[TIME])
+    	comments.append("こちらはいま{0}時です".format(data[TIME]))
     else:
     	if (data[TIME] >= 23 or data[TIME] < 6):
-		comment = "{0}時だよ. まだ仕事してんの?" 
+		comments.append("{0}時だよ. まだ仕事してんの?".format(data[TIME]))
     	if (data[TIME] >= 6 and data[TIME] < 12):
-		comment = "おはー!"
+		comments.append("おはよう")
+		comments.append("おはー!")
     	if (data[TIME] >= 12 and data[TIME] < 16):
-		comment = "こんにちはー!"
+		comments.append("もうお昼だね")
+		comments.append("こんにちはー!")
     	if (data[TIME] >= 16 and data[TIME] < 23):
-		comment = "こんばんはー!"  
-    return comment
+		comments.append("こんばんはー!")
+		comments.append("おやすみなさい")
+    return random.choice(comments)
 
 def generate_posinfo(data={}):
     if data[POS][0] > 0:
@@ -173,6 +190,8 @@ def select_comment(intention=0, data={}):
 	comment = generate_timeinfo(data=data)
     elif intention == 4:
 	comment = generate_addressinfo(data=data)
+    elif intention == 6:
+	comment = generate_knowledge(data=data)
     else:
         return "Error!"
 
@@ -231,6 +250,12 @@ with open("zatudan.text") as fp:
     zatudan_data = map(lambda x: x.rstrip(), fp.readlines())
 with open("zatudan_hinode.text") as fp:
     zatudan_hinode_data = map(lambda x: x.rstrip(), fp.readlines())
+with open("knowledge_hinode.text") as fp:
+    knowledge_hinode_data = map(lambda x: x.rstrip(), fp.readlines())
+with open("knowledge_ibuki.text") as fp:
+    knowledge_ibuki_data = map(lambda x: x.rstrip(), fp.readlines())
+with open("knowledge_lang8.text") as fp:
+    knowledge_lang8_data = map(lambda x: x.rstrip(), fp.readlines())
 
 if __name__ == '__main__':
 
