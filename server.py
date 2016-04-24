@@ -151,11 +151,12 @@ def generate_timeinfo(data={}):
     r1 = random.SystemRandom(seed) 
     comments = []
     if (r1 > 0.9):
-    	comments.append("こちらはいま{0}時です".format(data[TIME]))
+    	comments.append("こちらはいま{0}時だよ".format(data[TIME]))
     else:
     	if (data[TIME] >= 23 or data[TIME] < 6):
 		comments.append("{0}時だよ. まだ仕事してんの?".format(data[TIME]))
     	if (data[TIME] >= 6 and data[TIME] < 12):
+		comments.append("朝だよ")
 		comments.append("おはよう")
 		comments.append("おはー!")
     	if (data[TIME] >= 12 and data[TIME] < 16):
@@ -177,6 +178,7 @@ def generate_posinfo(data={}):
 	lon = "西経"
     info = lat+"{0}度,".format(round(data[POS][0],1))+lon+"{0}度".format(round(data[POS][1],1))
     comments = []
+    comments.append("{0}に来たよ".format(info))
     comments.append("この辺は{0}かな".format(info))
     comments.append("いま、{0}にいるよ！".format(info))
     return random.choice(comments)
@@ -261,6 +263,5 @@ if __name__ == '__main__':
 
     _port = 30000
     app.run(host='0.0.0.0', debug=True, port=_port)
-
 
 
