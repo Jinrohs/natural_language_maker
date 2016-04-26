@@ -11,7 +11,7 @@
 - ネタ発言
  
 # natural_language_maker
-Repogitory for generating tweets by the satellites.
+API to determine the contents of the tweets by the satellites.
 
 ## Classes
 
