@@ -53,8 +53,8 @@ satellite_data = {
 
 [POS, TIME, ADDRESS, ID, KNOWLEDGE]=[2, 3, 4, 5, 6]
 
-def get_localtime(pos):
-    now = datetime.datetime.utcnow()
+def get_localtime(timestamp, pos):
+    now = datetime.datetime.utcfromtimestamp(timestamp)
     delta_h = round(pos[1]/15)
     d = timedelta(hours=delta_h)
     local = now + d
@@ -268,7 +268,7 @@ def home():
     data[ID] = _id
     pos = get_position(_id, timestamp)
     address = convert_geocode(pos[0], pos[1])
-    utctime = get_localtime(pos)
+    utctime = get_localtime(timestamp, pos)
     data[POS] = pos
     data[ADDRESS] = address
     data[TIME] = utctime
