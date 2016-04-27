@@ -268,7 +268,7 @@ def home():
     data[ID] = _id
     pos = get_position(_id, timestamp)
     address = convert_geocode(pos[0], pos[1])
-    utctime = get_localtime(timestamp, pos)
+    utctime = get_localtime(pos)
     data[POS] = pos
     data[ADDRESS] = address
     data[TIME] = utctime
