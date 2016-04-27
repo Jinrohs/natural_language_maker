@@ -23,7 +23,7 @@ def find_grid(zoom, lat, lon):
     ny = int(round((lat - ymin)/dy))	
     return (nx, ny)
 
-zoom = 6
+zoom = 4
 worldgeo_data = defaultdict(list)
 with open("worldgeo.csv") as fp:
     reader = csv.reader(fp)

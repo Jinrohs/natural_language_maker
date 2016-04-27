@@ -97,9 +97,9 @@ def select_intention(_id=0, data={}):
 
     cands.append(1)
 
-    cands.append(6)
-    cands.append(6)
-    cands.append(6)
+    #cands.append(6)
+    #cands.append(6)
+    #cands.append(6)
 
     # ひので
     if data[ID] == '29479':
@@ -107,16 +107,18 @@ def select_intention(_id=0, data={}):
         cands.append(8)
         cands.append(8)
 
-    if data[POS]:
-    	cands.append(2)
+    #if data[POS]:
+    	#cands.append(2)
 
-    if data[TIME]:
-    	cands.append(3)
-    	cands.append(3)
-    	cands.append(3)
-    	cands.append(3)
+    #if data[TIME]:
+    	#cands.append(3)
+    	#cands.append(3)
+    	#cands.append(3)
+    	#cands.append(3)
 
     if data[ADDRESS]:
+    	cands.append(4)
+    	cands.append(4)
     	cands.append(4)
     	cands.append(4)
     	cands.append(4)
@@ -162,8 +164,8 @@ def generate_zatudan(data={}):
     else:
         return random.choice(zatudan_data)
 
-def convert_geocode(lon, lat):
-    address = world_geo.convert_geocode(lon, lat)
+def convert_geocode(lat, lon):
+    address = world_geo.convert_geocode(lat, lon)
     #try:
     #    res = gmaps.reverse_geocode((lon, lat))
     #    for r in res[0]["address_components"]:
@@ -175,6 +177,7 @@ def convert_geocode(lon, lat):
     #except:
     #    address = ""
     print "address:", address
+    print "lat, lon:", lat, lon
     return address
 
 def generate_debri(data={}):
