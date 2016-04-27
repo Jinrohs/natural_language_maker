@@ -15,6 +15,8 @@ import requests
 import calendar
 import datetime
 
+import world_geo
+
 app = Flask(__name__)
 
 satellite_data = {
@@ -64,11 +66,12 @@ def get_localtime(unixtime, pos):
     now = datetime.datetime.utcfromtimestamp(loctime) # Unix time -> UTC の naive オブジェクト
     return now.hour
 
-def get_picurl(data={}):
-    zoom = 6
-    (row, col) = find_grid(zoom, data)
-    url="http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/2012-07-09/EPSG4326_250m/6/" + str(row) + "/" + str(col) + ".jpg"
-    return url
+## 現在は使えない
+#def get_picurl(data={}):
+#    zoom = 6
+#    (row, col) = find_grid(zoom, data)
+#    url="http://map1.vis.earthdata.nasa.gov/wmts-geo/MODIS_Terra_CorrectedReflectance_TrueColor/default/2012-07-09/EPSG4326_250m/6/" + str(row) + "/" + str(col) + ".jpg"
+#    return url
 
 def get_position(_id, timestamp):
     url="http://210.140.86.209:5000/lat_lng_alt?time=" + timestamp + "&ids="+_id
@@ -94,9 +97,9 @@ def select_intention(_id=0, data={}):
 
     cands.append(1)
 
-    cands.append(6)
-    cands.append(6)
-    cands.append(6)
+    #cands.append(6)
+    #cands.append(6)
+    #cands.append(6)
 
     # ひので
     if data[ID] == '29479':
@@ -104,16 +107,18 @@ def select_intention(_id=0, data={}):
         cands.append(8)
         cands.append(8)
 
-    if data[POS]:
-    	cands.append(2)
+    #if data[POS]:
+    	#cands.append(2)
 
-    if data[TIME]:
-    	cands.append(3)
-    	cands.append(3)
-    	cands.append(3)
-    	cands.append(3)
+    #if data[TIME]:
+    	#cands.append(3)
+    	#cands.append(3)
+    	#cands.append(3)
+    	#cands.append(3)
 
     if data[ADDRESS]:
+    	cands.append(4)
+    	cands.append(4)
     	cands.append(4)
     	cands.append(4)
     	cands.append(4)
@@ -159,18 +164,20 @@ def generate_zatudan(data={}):
     else:
         return random.choice(zatudan_data)
 
-def convert_geocode(lon, lat):
-    try:
-        res = gmaps.reverse_geocode((lon, lat))
-        for r in res[0]["address_components"]:
-            if 'country' in r['types']:
-                country = r["long_name"]
-            if 'administrative_area_level_1' in r['types']:
-                admin_area = r["long_name"]
-        address = u"{0}_{1}".format(country, admin_area)
-    except:
-        address = ""
+def convert_geocode(lat, lon):
+    address = world_geo.convert_geocode(lat, lon)
+    #try:
+    #    res = gmaps.reverse_geocode((lon, lat))
+    #    for r in res[0]["address_components"]:
+    #        if 'country' in r['types']:
+    #            country = r["long_name"]
+    #        if 'administrative_area_level_1' in r['types']:
+    #            admin_area = r["long_name"]
+    #    address = u"{0}_{1}".format(country, admin_area)
+    #except:
+    #    address = ""
     print "address:", address
+    print "lat, lon:", lat, lon
     return address
 
 def generate_debri(data={}):
@@ -305,6 +312,8 @@ with open("knowledge_ibuki.text") as fp:
     knowledge_ibuki_data = map(lambda x: x.rstrip(), fp.readlines())
 with open("knowledge_lang8.text") as fp:
     knowledge_lang8_data = map(lambda x: x.rstrip(), fp.readlines())
+with open("worldgeo.csv") as fp:
+    world_geo_data = map(lambda x: x.rstrip(), fp.readlines())
 
 if __name__ == '__main__':
 
