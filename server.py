@@ -97,9 +97,9 @@ def select_intention(_id=0, data={}):
 
     cands.append(1)
 
-    #cands.append(6)
-    #cands.append(6)
-    #cands.append(6)
+    cands.append(6)
+    cands.append(6)
+    cands.append(6)
 
     # ひので
     if data[ID] == '29479':
@@ -107,14 +107,14 @@ def select_intention(_id=0, data={}):
         cands.append(8)
         cands.append(8)
 
-    #if data[POS]:
-    	#cands.append(2)
+    if data[POS]:
+    	cands.append(2)
 
-    #if data[TIME]:
-    	#cands.append(3)
-    	#cands.append(3)
-    	#cands.append(3)
-    	#cands.append(3)
+    if data[TIME]:
+    	cands.append(3)
+    	cands.append(3)
+    	cands.append(3)
+    	cands.append(3)
 
     if data[ADDRESS]:
     	cands.append(4)
