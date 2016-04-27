@@ -3,6 +3,7 @@
 
 from flask import Flask, request, jsonify
 from datetime import date
+from datetime import timedelta
 import time
 import datetime
 from time import mktime
@@ -54,17 +55,12 @@ satellite_data = {
 
 [POS, TIME, ADDRESS, ID, KNOWLEDGE]=[2, 3, 4, 5, 6]
 
-def get_localtime(unixtime, pos):
-    url="https://maps.googleapis.com/maps/api/timezone/json?location=" + str(round(pos[0],7)) + "," + str(round(pos[1], 7)) +"&timestamp=" + unixtime + "&key=AIzaSyC5n6UIB3HT8mifCTzrkU4PSXGcBDL7wYE"
-    timeinfo = requests.get(url).json()
-    if timeinfo["status"] != "OK":
-    	print timeinfo
-    	print url
-	return None
-
-    loctime = int(unixtime) + timeinfo["rawOffset"] + timeinfo["dstOffset"] 
-    now = datetime.datetime.utcfromtimestamp(loctime) # Unix time -> UTC の naive オブジェクト
-    return now.hour
+def get_localtime(timestamp, pos):
+    now = datetime.datetime.utcfromtimestamp(timestamp)
+    delta_h = round(pos[1]/15)
+    d = timedelta(hours=delta_h)
+    local = now + d
+    return (local.hour, local.minute)
 
 ## 現在は使えない
 #def get_picurl(data={}):
@@ -201,18 +197,18 @@ def generate_timeinfo(data={}):
     r1 = random.SystemRandom(seed) 
     comments = []
     if (r1 > 0.9):
-    	comments.append("こちらはいま{0}時だよ".format(data[TIME]))
+    	comments.append("こちらはいま{0}時{1}分だよ".format(data[TIME][0], data[TIME][1]))
     else:
-    	if (data[TIME] >= 23 or data[TIME] < 6):
-		comments.append("{0}時だよ. まだ仕事してんの?".format(data[TIME]))
-    	if (data[TIME] >= 6 and data[TIME] < 12):
+    	if (data[TIME][0] >= 23 or data[TIME][0] < 6):
+		comments.append("{0}時{1}分だよ. まだ仕事してんの?".format(data[TIME][0], data[TIME][1]))
+    	if (data[TIME][0] >= 6 and data[TIME][0] < 12):
 		comments.append("朝だよ")
 		comments.append("おはよう")
 		comments.append("おはー!")
-    	if (data[TIME] >= 12 and data[TIME] < 16):
+    	if (data[TIME][0] >= 12 and data[TIME][0] < 16):
 		comments.append("もうお昼だね")
 		comments.append("こんにちはー!")
-    	if (data[TIME] >= 16 and data[TIME] < 23):
+    	if (data[TIME][0] >= 16 and data[TIME][0] < 23):
 		comments.append("こんばんはー!")
 		comments.append("おやすみなさい")
     return random.choice(comments)
