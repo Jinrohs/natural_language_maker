@@ -9,7 +9,6 @@ from time import mktime
 import time
 import json
 import random
-import googlemaps
 import urllib2
 import requests
 import calendar
@@ -166,16 +165,6 @@ def generate_zatudan(data={}):
 
 def convert_geocode(lat, lon):
     address = world_geo.convert_geocode(lat, lon)
-    #try:
-    #    res = gmaps.reverse_geocode((lon, lat))
-    #    for r in res[0]["address_components"]:
-    #        if 'country' in r['types']:
-    #            country = r["long_name"]
-    #        if 'administrative_area_level_1' in r['types']:
-    #            admin_area = r["long_name"]
-    #    address = u"{0}_{1}".format(country, admin_area)
-    #except:
-    #    address = ""
     print "address:", address
     print "lat, lon:", lat, lon
     return address
@@ -300,8 +289,6 @@ def home():
     response.headers['Access-Control-Allow-Origin'] = "*"
     return response
 
-gmaps = googlemaps.Client('AIzaSyC5n6UIB3HT8mifCTzrkU4PSXGcBDL7wYE')
-#'AIzaSyBaXrjMRZo2WFyYBAtvamA7ukoW70ttYzY'
 with open("zatudan.text") as fp:
     zatudan_data = map(lambda x: x.rstrip(), fp.readlines())
 with open("zatudan_hinode.text") as fp:

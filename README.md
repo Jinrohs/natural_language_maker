@@ -1,17 +1,10 @@
-# natural_language_maker
-発言内容を決定するAPIサーバ
-
-## 必要なクラス
-
-- 他の衛星とあいさつ
-- 気温に関する発言
-- 気象に関する発言
-- 時間に関する発言
-- 位置に関する発言
-- ネタ発言
- 
-# natural_language_maker
+# CatelliteVoiceAPI
 API to determine the contents of the tweets by the satellites.
+
+## How to use
+```
+python server.py
+```
 
 ## Classes
 
